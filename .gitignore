@@ -1,3 +1,7 @@
 .xml
 .log
-
+.pyc
+.bmp
+.jpg
+.png
+.iml
