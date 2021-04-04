@@ -1,10 +1,10 @@
 """Módulo de Configurações"""
 
 class Configuracoes():
-    """Uma classe para armazenar todas as configurações da Invasão Alienígena"""
+    """Uma classe para  armazenar todas as configurações da Invasão Alienígena"""
     def __init__(self):
         """Inicializa as configurações do jogo"""
-        self.tela_width = 1360             #Configuração da tela , largura
+        self.tela_width = 1359            #Configuração da tela , largura
         self.tela_height = 700             #Configuracao da tela , altura
         self.bg_color = (0, 0, 0)          #Configuração da cor de fundo da tela
         self.nave_speed_factor = 1.5       #Configurações da espaçonave para ajuste da velocidade

@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 
 class Municao(Sprite):
-    """Uma classe que administra projéteis disparados pela espaçonave"""
+    """Uma classe que administra projéteis disparados  pela espaçonave"""
 
     def __init__(self, ai_configuracoes, tela, nave_espacial):
         """Cria um objeto para o projétil na posição atual da espaçonave"""

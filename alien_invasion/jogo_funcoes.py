@@ -1,4 +1,4 @@
-"""Módulo que armazena as funções do jogo"""
+"""Módulo que armazena as  funções do jogo"""
 import sys
 import pygame
 from municao import Municao

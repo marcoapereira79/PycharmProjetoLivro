@@ -9,7 +9,7 @@ def run_game():
     pygame.init()                                                #Inicializa o jogo e cria um objeto para a tela
     ai_configuracoes = Configuracoes()                           #objeto ai_configuracoes da Classe Configuracoes
     tela = pygame.display.set_mode((ai_configuracoes.tela_width, ai_configuracoes.tela_height))
-    pygame.display.set_caption("Alien Invasion")
+    pygame.display.set_caption("Space War")
     nave_espacial = Nave(ai_configuracoes, tela)                 #objeto nave_espacial da classe Nave
     municoes = Group()                                           #Cria um grupo no qual serão armazenados as munições
     aliens = Group()                                             #Cria um grupo vazio para armazenar os aliens do jogo

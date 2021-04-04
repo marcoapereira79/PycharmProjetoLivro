@@ -5,3 +5,6 @@
 .jpg
 .png
 .iml
+*.pyc
+*.iml
+*.xml

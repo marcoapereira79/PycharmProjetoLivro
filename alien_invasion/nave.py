@@ -5,7 +5,7 @@ class Nave():
         """Inicializa a espaçonave e define sua posição inicial."""
         self.ai_configuracoes = ai_configuracoes
         self.tela = tela
-        self.image = pygame.image.load('/home/marco_user/PycharmProjetoLivro/alien_invasion/imagens/nave_nova1.bmp')   #Carrega a imagem da espaçonave
+        self.image = pygame.image.load('/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/imagens/nave_nova1.bmp')   #Carrega a imagem da espaçonave
         self.rect = self.image.get_rect()                    #atributo da superfície - o Pygame trata elementos como retângulos , rects
         self.tela_rect = tela.get_rect()
         self.rect.centerx = self.tela_rect.centerx            #Inicia cada nova espaçonave na parte inferior central da tela
