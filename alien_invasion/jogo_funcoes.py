@@ -44,17 +44,25 @@ def update_tela(ai_configuracoes, tela, nave_espacial, aliens, municoes):
     for municao in municoes.sprites():
         municao.desenha_projetil()
     nave_espacial.blitme()
-    aliens.draw(tela)
-
+    aliens.draw(tela)         #desenha cada alienigena do grupo na tela
     pygame.display.flip()
 
 
-def update_municoes(municoes):
+def update_municoes(ai_configuracoes, tela, nave_espacial, aliens, municoes):
     """Atualiza as posicoes dos projéteis antigos, se o projétil chega ao fim da tela é removido"""
     municoes.update()
     for municao in municoes.copy():
         if municao.rect.bottom <= 0:                               #verifica se o projétil chegou ao fim da tela
             municoes.remove(municao)
+        check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, aliens, municoes)
+
+
+def check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, aliens, municoes):
+    """Responde a colisões entre projéteis e alienígenas."""
+    colisoes = pygame.sprite.groupcollide(municoes, aliens, False, True)  # verifica se algum projétil atingiu os alienígenas , em caso afirmativo se livra do projétil e do alien
+    if len(aliens) == 0:          #Destrói os projéteis existentes e cria uma nova frota
+        municoes.empty()          #remove todos os sprites de munições
+        cria_frota(ai_configuracoes, tela, nave_espacial, aliens)
 
 
 def tiro_municao(ai_configuracoes, tela, nave_espacial, municoes):
@@ -83,7 +91,7 @@ def get_numero_aliens_x(ai_configuracoes, alien_width):
 
 def get_numero_linhas(ai_configuracoes, nave_height, alien_height):
     """Determina o número de linhas com alinígenas que cabem na tela"""
-    espaco_livre_y = (ai_configuracoes.tela_height - (6 * alien_height) - nave_height)
+    espaco_livre_y = (ai_configuracoes.tela_height - (3 * alien_height) - nave_height)
     numero_linhas = int(espaco_livre_y / (2 * alien_height))
     return numero_linhas
 
@@ -96,12 +104,7 @@ def cria_frota(ai_configuracoes, tela, nave_espacial, aliens):
     for linha in range(numero_linhas):                                      #laço para preencher as linhas da tela(eixo y) com aliens
         for qtde_aliens in range(numero_aliens_x):                          #laço para preencher uma linha (eixo x) com aliens
             criar_alien(ai_configuracoes, tela, aliens, qtde_aliens, linha)
-        aliens.add(alien)                                                   #Adiciona o alienígena criado ao Group()
-
-def update_aliens(aliens, ai_configuracoes):
-    """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
-    check_frota_bordas(ai_configuracoes, aliens)
-    aliens.update()     #Usando o método update() no Grupo aliens , fará o método update() de cada alienígena ser chamado automaticamente
+        aliens.add(alien)  #Adiciona o alienígena criado ao Group()
 
 
 def check_frota_bordas(ai_configuracoes, aliens):
@@ -109,15 +112,21 @@ def check_frota_bordas(ai_configuracoes, aliens):
     for alien in aliens.sprites():
         if alien.check_bordas():
             trocar_direcao_frota(ai_configuracoes, aliens)
-        break
+            break
+
 
 
 def trocar_direcao_frota(ai_configuracoes, aliens):
     """Faz a frota inteira descer e mudar a direcao"""
     for alien in aliens.sprites():
         alien.rect.y += ai_configuracoes.frota_drop_speed                   #horda desce na tela
-        ai_configuracoes.frota_direcao *= -1                                #muda a direção do alien
+        ai_configuracoes.frota_direcao *= -1                             #muda a direção do alien
 
+
+def update_aliens(aliens, ai_configuracoes):
+    """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
+    check_frota_bordas(ai_configuracoes, aliens)
+    aliens.update()  # Usando o método update() no Grupo aliens , fará o método update() de cada alienígena ser chamado automaticamente
 
 
 

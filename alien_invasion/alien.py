@@ -16,23 +16,20 @@ class Alien(Sprite):
         self.x = float(self.rect.x)                 #Armazena a posição exata do alienígena
 
 
-    def blitme(self):
-        """Desenha o alienígena em sua posição atual."""
-        self.tela.blit(self.image, self.rect)
-
-
-    def update(self):
-        """Move o alienígena para a direita ou para a esquerda"""
-        self.x += (self.ai_configuracoes.alien_speed_factor * self.ai_configuracoes.frota_direcao) #Soma o fator de velocidade ao eixo x da imagem do alien
-        self.rect.x = self.x                                  #Atualizo a posição do rect do alien
-
-
     def check_bordas(self):
-        """Verifica se o alienígena chegou na borda da tela"""
+        """Verifica se o alienígena chegou na borda da tela e devolve True"""
         tela_rect = self.tela.get_rect()
         if self.rect.right >= tela_rect.right:        #SE frota alien na borda direita da tela
             return True
         elif self.rect.left <= 0:                             #SE frota alien na borda esquerda da tela
             return True
+
+
+    def update(self):
+        """Move o alienígena para a direita ou para a esquerda"""
+        self.x += (self.ai_configuracoes.alien_speed_factor * self.ai_configuracoes.frota_direcao) #Soma o fator de velocidade ao eixo x da imagem do alien
+        self.rect.x = self.x #Atualizo a posição do rect do alien
+
+
 
 

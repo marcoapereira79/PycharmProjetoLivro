@@ -16,10 +16,11 @@ def run_game():
     jf.cria_frota(ai_configuracoes, tela, nave_espacial, aliens) #Cria uma frota de aliens (usa configurações, tela e um grupo vazio de aliens)
 
 
+
     while True:   #Inicia o laço principal do jogo
         jf.check_eventos(ai_configuracoes, tela, nave_espacial, municoes)   #checa os eventos
         nave_espacial.update_nave()                                         #posicionamento da nave
-        jf.update_municoes(municoes)                                        #verifica as municoes na tela ,se houve disparo
+        jf.update_municoes(ai_configuracoes, tela, nave_espacial, aliens, municoes)                                        #verifica as municoes na tela ,se houve disparo
         jf.update_aliens(aliens, ai_configuracoes)
         jf.update_tela(ai_configuracoes, tela, nave_espacial, aliens,  municoes)   #update da tela
 
