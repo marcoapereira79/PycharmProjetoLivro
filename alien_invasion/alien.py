@@ -11,7 +11,7 @@ class Alien(Sprite):
         self.ai_configuracoes = ai_configuracoes
         self.image = pygame.image.load('/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/imagens/aliens-1.bmp')
         self.rect = self.image.get_rect()
-        self.rect.x = self.rect.width       
+        self.rect.x = self.rect.width    #Inicia cada novo alienígena próximo à parte superior esquerda da tela
         self.rect.y = self.rect.height
         self.x = float(self.rect.x)                 #Armazena a posição exata do alienígena
 
