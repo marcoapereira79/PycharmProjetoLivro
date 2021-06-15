@@ -54,12 +54,12 @@ def update_municoes(ai_configuracoes, tela, nave_espacial, aliens, municoes):
     for municao in municoes.copy():
         if municao.rect.bottom <= 0:                               #verifica se o projétil chegou ao fim da tela
             municoes.remove(municao)
-        check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, aliens, municoes)
+        check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, municoes, aliens)
 
 
-def check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, aliens, municoes):
+def check_municao_alien_colisoes(ai_configuracoes, tela, nave_espacial, municoes, aliens):
     """Responde a colisões entre projéteis e alienígenas."""
-    colisoes = pygame.sprite.groupcollide(municoes, aliens, False, True)  # verifica se algum projétil atingiu os alienígenas , em caso afirmativo se livra do projétil e do alien
+    colisoes = pygame.sprite.groupcollide(municoes, aliens, True, True)  # verifica se algum projétil atingiu os alienígenas , em caso afirmativo se livra do projétil e do alien
     if len(aliens) == 0:          #Destrói os projéteis existentes e cria uma nova frota
         municoes.empty()          #remove todos os sprites de munições
         cria_frota(ai_configuracoes, tela, nave_espacial, aliens)
@@ -82,25 +82,27 @@ def criar_alien(ai_configuracoes, tela, aliens, qtde_aliens, linha):
     aliens.add(alien)
 
 
-def get_numero_aliens_x(ai_configuracoes, alien_width):
+def get_numero_aliens_x(ai_configuracoes, alien_largura ):
     """Determina o número de alienígenas que cabem em uma linha"""
-    espaco_livre_x = ai_configuracoes.tela_width - 2 * alien_width
-    numero_aliens_x = int(espaco_livre_x / (2 * alien_width))
+    espaco_livre_x = ai_configuracoes.tela_width - 2 * alien_largura
+    numero_aliens_x = int(espaco_livre_x / (2 * alien_largura ))
     return numero_aliens_x
 
 
-def get_numero_linhas(ai_configuracoes, nave_height, alien_height):
+
+def get_numero_linhas(ai_configuracoes, nave_espacial, alien):
     """Determina o número de linhas com alinígenas que cabem na tela"""
-    espaco_livre_y = (ai_configuracoes.tela_height - (3 * alien_height) - nave_height)
-    numero_linhas = int(espaco_livre_y / (2 * alien_height))
+    espaco_livre_y = (ai_configuracoes.tela_height - (3 * alien.rect.height) - nave_espacial.rect.height)
+    numero_linhas = int(espaco_livre_y / (2 * alien.rect.height))
     return numero_linhas
 
 
 def cria_frota(ai_configuracoes, tela, nave_espacial, aliens):
     """Cria uma frota completa de aliens"""
-    alien = Alien(ai_configuracoes, tela)                                   #Cria um alienígena
-    numero_aliens_x = get_numero_aliens_x(ai_configuracoes, alien.rect.x)   #Calcula a qtde de alienígenas que cabem numa linha
-    numero_linhas = get_numero_linhas(ai_configuracoes, nave_espacial.rect.height, alien.rect.height)
+    alien = Alien(ai_configuracoes, tela)  #Cria um alienígena
+    alien_largura = alien.rect.width
+    numero_aliens_x = get_numero_aliens_x(ai_configuracoes, alien_largura)   #Calcula a qtde de alienígenas que cabem numa linha
+    numero_linhas = get_numero_linhas(ai_configuracoes, nave_espacial, alien)
     for linha in range(numero_linhas):                                      #laço para preencher as linhas da tela(eixo y) com aliens
         for qtde_aliens in range(numero_aliens_x):                          #laço para preencher uma linha (eixo x) com aliens
             criar_alien(ai_configuracoes, tela, aliens, qtde_aliens, linha)
@@ -123,7 +125,7 @@ def trocar_direcao_frota(ai_configuracoes, aliens):
         ai_configuracoes.frota_direcao *= -1                             #muda a direção do alien
 
 
-def update_aliens(aliens, ai_configuracoes):
+def update_aliens(ai_configuracoes, aliens):
     """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
     check_frota_bordas(ai_configuracoes, aliens)
     aliens.update()  # Usando o método update() no Grupo aliens , fará o método update() de cada alienígena ser chamado automaticamente

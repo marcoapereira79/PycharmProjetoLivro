@@ -18,8 +18,8 @@ class Municao(Sprite):
 
     def update(self):
         """Move o projétil para cima na tela"""
-        self.y -= self.speed_factor             #Dá velocidade ao projétil alterando suaposição no eixo y (subindo na tela)
-        self.rect.y = self.y                    #Atualiza a posição de rect
+        self.y -= self.speed_factor             #Dá velocidade ao projétil alterando sua posição no eixo y (subindo na tela)
+        self.rect.y = self.y                 #Atualiza a posição de rect
 
 
     def desenha_projetil(self):
