@@ -1,29 +1,31 @@
 import pygame
 from pygame.sprite import Group
-from configuracoes import Configuracoes             #módulo configurações
-from nave import Nave                               #módulo nave (herói)
-import jogo_funcoes as jf                           #módulo funções do jogo com aliás jf
+from configuracoes import Configuracoes
+from nave import Nave
+import jogo_funcoes as jf
 
 
 def run_game():
-    pygame.init()                                                #Inicializa o jogo e cria um objeto para a tela
-    ai_configuracoes = Configuracoes()                           #objeto ai_configuracoes da Classe Configuracoes
-    tela = pygame.display.set_mode ((ai_configuracoes.tela_width, ai_configuracoes.tela_height))
+    pygame.init()
+    ai_configuracoes = Configuracoes()
+    tela = pygame.display.set_mode((ai_configuracoes.tela_width, ai_configuracoes.tela_height))
     pygame.display.set_caption("Space War")
-    nave_espacial = Nave(ai_configuracoes, tela)                 #objeto nave_espacial da classe Nave
-    municoes = Group()                                           #Cria um grupo no qual serão armazenados as munições
-    aliens = Group()                                             #Cria um grupo vazio para armazenar os aliens do jogo
-    jf.cria_frota(ai_configuracoes, tela, nave_espacial, aliens) #Cria uma frota de aliens (usa configurações, tela e um grupo vazio de aliens)
+    # Cria uma espaçonave
+    nave = Nave(ai_configuracoes, tela)
+    # Cria um grupo no qual armazeno os projéteis
+    municoes = Group()
+    # Cria um grupo no qual armazeno os aliens
+    aliens = Group()
+    # Cria a frota de alienígenas
+    jf.cria_frota(ai_configuracoes, tela, nave, aliens)
 
-
-
-    while True:   #Inicia o laço principal do jogo
-        jf.check_eventos(ai_configuracoes, tela, nave_espacial, municoes)           #checa os eventos
-        nave_espacial.update_nave()                                                 #posicionamento da nave
-        jf.update_municoes(ai_configuracoes, tela, nave_espacial, aliens, municoes) #verifica as municoes na tela ,se houve disparo
+    #Inicia o laço principal do jogo
+    while True:
+        jf.check_eventos(ai_configuracoes, tela, nave, municoes)
+        nave.update_nave()
+        jf.update_municoes(ai_configuracoes, tela, nave, aliens, municoes)
         jf.update_aliens(ai_configuracoes, aliens)
-        jf.update_tela(ai_configuracoes, tela, nave_espacial, aliens,  municoes)    #update da tela
-
+        jf.update_tela(ai_configuracoes, tela, nave, aliens, municoes)
 
 
 run_game()
