@@ -27,3 +27,7 @@ class Nave:
     def blitme(self):
         """Desenha a espaçonave em sua posição atual"""
         self.tela.blit(self.imge, self.rect)
+
+    def centralizar_nave(self):
+        """Centraliza a espaçonave na tela"""
+        self.center = self.tela_rect.centerx

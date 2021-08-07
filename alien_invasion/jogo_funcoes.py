@@ -2,7 +2,7 @@ import sys
 import pygame
 from municao import Municao
 from alien import Alien
-
+from time import sleep
 
 def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
     """Responde a pressionamento de teclas"""
@@ -17,7 +17,7 @@ def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
         sys.exit()
 
 
-def check_eventos(ai_configuracoes, tela, nave, municoes):
+def check_eventos(ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes):
     """Responde a eventos de pressionamento de teclas e do mouse"""
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -26,6 +26,30 @@ def check_eventos(ai_configuracoes, tela, nave, municoes):
             check_keydown_events(evento, ai_configuracoes, tela, nave, municoes)
         elif evento.type == pygame.KEYUP:
             check_keyup_events(evento, nave)
+        elif evento.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes, mouse_x, mouse_y)
+
+def check_play_button (ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes, mouse_x, mouse_y):
+    """Inicia um novo jogo quando o jogador clicar em Play e se o jogo não estiver ativo"""
+    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not estatistica.game_active:
+        # Oculta o cursor do mouse
+        pygame.mouse.set_visible(False)
+
+        # Reinicia os dados estatísticos do jogo
+        estatistica.reset_stats()
+
+        # Torna o jogo ativo se o botão Play for clicado
+        estatistica.game_active = True
+
+        # Esvazia a lista de aliens e de projéteis
+        aliens.empty()
+        municoes.empty()
+
+        # Cria uma nova frota e centraliza a nave
+        cria_frota(ai_configuracoes, tela, nave, aliens)
+        nave.centralizar_nave()
 
 
 def check_keyup_events(evento, nave):
@@ -38,14 +62,21 @@ def check_keyup_events(evento, nave):
         sys.exit()
 
 
-def update_tela(ai_configuracoes, tela, nave, aliens, municoes):
+def update_tela(ai_configuracoes, estatistica, tela, nave, aliens, municoes, play_button):
     """Atualiza as imagens na tela e alterna para a nova tela"""
     tela.fill(ai_configuracoes.bg_color)
+
     # Redesenha todos os projéteis atrás da espçonave e dos alienígenas
     for municao in municoes.sprites():
         municao.desenha_projetil()
+    # Desenha a nave chamando a função da Classe Nave
     nave.blitme()
+    # desenha o Grupo sprite
     aliens.draw(tela)
+
+    # Desenha o botão Play se o jogo estiver inativo
+    if not estatistica.game_active:
+        play_button.draw_button()
 
     # Deixa a tela mais recente visível.
     pygame.display.flip()
@@ -57,6 +88,7 @@ def update_municoes(ai_configuracoes, tela, nave, aliens, municoes):
     municoes.update()
     # Livra-se dos projéteis que desapareceram
     for municao in municoes.copy():
+        # Se a munição chegar ao fim da tela
         if municao.rect.bottom <= 0:
             municoes.remove(municao)
     check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens)
@@ -66,9 +98,11 @@ def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens)
     """Responde a colisões entre projéteis e alienígenas."""
     # Remove qualquer projétil e alienígena que tenham colidido
     colisoes = pygame.sprite.groupcollide(municoes, aliens, True, True)
+    # Se todos os aliens forem abatidos
     if len(aliens) == 0:
-        # Destrói os projéteis existentes e cria uma nova frota
+        # Destrói os projéteis existentes
         municoes.empty()
+        # Cria uma nova frota
         cria_frota(ai_configuracoes, tela, nave, aliens)
 
 
@@ -137,7 +171,49 @@ def trocar_direcao_frota(ai_configuracoes, aliens):
     ai_configuracoes.frota_direcao *= -1
 
 
-def update_aliens(ai_configuracoes, aliens):
+def update_aliens( ai_configuracoes,estatistica, tela, nave, aliens, municoes  ):
     """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
+    # Checa se a horda chegou nas bordas
     check_frota_bordas(ai_configuracoes, aliens)
+
+    # Atualiza o movimento do alien
     aliens.update()
+
+    # Verifica se há algum alienígena que atingiu o fundo da tela sem ser destruído
+    checa_aliens_fundo(ai_configuracoes,estatistica,tela,nave,aliens,municoes)
+
+    # Verifica se houve colisões entre alienígenas e a espaçonave
+    if pygame.sprite.spritecollideany(nave, aliens):
+        nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes)
+
+
+def nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
+    """Responde ao fato de a espaçonave ter sido atingida por um alienigena"""
+    # Se houverem naves (vida)
+    if estatistica.naves_abatidas > 0:
+        # Decrementa naves abatidas
+        estatistica.naves_abatidas -= 1
+        # Faz uma pausa
+        sleep(0.5)
+    else:
+        estatistica.game_active = False
+        pygame.mouse.set_visible(True)
+
+    # Esvazia a lista de alienígenas e de projéteis
+    aliens.empty()
+    municoes.empty()
+
+    # Cria uma nova frota e centraliza a espaçonave
+    cria_frota(ai_configuracoes, tela, nave, aliens)
+    nave.centralizar_nave()
+
+
+def checa_aliens_fundo(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
+    """Verifica se algum alienigena alcançou a parte inferior da tela"""
+    tela_rect = tela.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= tela_rect.bottom:
+            # Trata esse caso do mesmo modo que é feito quando a espaçonave é atingida
+            nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes)
+            break
+
