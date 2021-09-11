@@ -34,6 +34,8 @@ def check_play_button (ai_configuracoes, tela, estatistica, play_button, nave, a
     """Inicia um novo jogo quando o jogador clicar em Play e se o jogo não estiver ativo"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not estatistica.game_active:
+        # Reinicia as configurações do jogo
+        ai_configuracoes.initialize_dynamic_settings()
         # Oculta o cursor do mouse
         pygame.mouse.set_visible(False)
 
@@ -62,7 +64,7 @@ def check_keyup_events(evento, nave):
         sys.exit()
 
 
-def update_tela(ai_configuracoes, estatistica, tela, nave, aliens, municoes, play_button):
+def update_tela(ai_configuracoes, estatistica,rp ,tela, nave, aliens, municoes, play_button):
     """Atualiza as imagens na tela e alterna para a nova tela"""
     tela.fill(ai_configuracoes.bg_color)
 
@@ -71,8 +73,12 @@ def update_tela(ai_configuracoes, estatistica, tela, nave, aliens, municoes, pla
         municao.desenha_projetil()
     # Desenha a nave chamando a função da Classe Nave
     nave.blitme()
+
     # desenha o Grupo sprite
     aliens.draw(tela)
+
+    # Desenha a informação sobre pontuação
+    rp.show_pontos()
 
     # Desenha o botão Play se o jogo estiver inativo
     if not estatistica.game_active:
@@ -82,7 +88,7 @@ def update_tela(ai_configuracoes, estatistica, tela, nave, aliens, municoes, pla
     pygame.display.flip()
 
 
-def update_municoes(ai_configuracoes, tela, nave, aliens, municoes):
+def update_municoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp):
     """Atualiza as posicoes dos projéteis antigos, se o projétil chega ao fim da tela é removido"""
     # Atualiza a posição dos projéteis
     municoes.update()
@@ -91,17 +97,23 @@ def update_municoes(ai_configuracoes, tela, nave, aliens, municoes):
         # Se a munição chegar ao fim da tela
         if municao.rect.bottom <= 0:
             municoes.remove(municao)
-    check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens)
+    check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp)
 
 
-def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens):
+def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp):
     """Responde a colisões entre projéteis e alienígenas."""
     # Remove qualquer projétil e alienígena que tenham colidido
     colisoes = pygame.sprite.groupcollide(municoes, aliens, True, True)
+    # No caso de colisões
+    if colisoes:
+        estatistica.pontos += ai_configuracoes.alien_pontos
+        rp.prep_pontos()
+
     # Se todos os aliens forem abatidos
     if len(aliens) == 0:
-        # Destrói os projéteis existentes
+        # Destrói os projéteis existentes , aumenta a velocidade do jogo
         municoes.empty()
+        ai_configuracoes.increase_speed()
         # Cria uma nova frota
         cria_frota(ai_configuracoes, tela, nave, aliens)
 
