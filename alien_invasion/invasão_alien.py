@@ -33,12 +33,15 @@ def run_game():
 
     #Inicia o laço principal do jogo
     while True:
-        jf.check_eventos(ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes)
+        jf.check_eventos(ai_configuracoes, tela, estatistica, rp, play_button, nave, aliens, municoes)
         # Só executará se o game estiver ativo (game inativo se as vidas terminarem)
         if estatistica.game_active:
+            # Update da nave
             nave.update_nave()
+            # Update da munição , também verifica a colisão da munição com aliens e atualiza os score de pontos
             jf.update_municoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp)
-            jf.update_aliens(ai_configuracoes,estatistica, tela, nave, aliens, municoes)
+            # Update da frota
+            jf.update_aliens(ai_configuracoes,estatistica, tela, rp, nave, aliens, municoes)
 
         jf.update_tela(ai_configuracoes, estatistica,rp ,tela, nave, aliens, municoes, play_button)
 

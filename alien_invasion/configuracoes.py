@@ -23,7 +23,7 @@ class Configuracoes:
         self.frota_direcao = 1
 
         # Configuração da Munição
-        self.municao_width = 2
+        self.municao_width = 5
         self.municao_height = 15
         self.municao_color = 247, 20, 43
         self.municao_speed_factor = 3
@@ -32,6 +32,10 @@ class Configuracoes:
         # A taxa com que a velocidade do jogo aumenta
         self.speedup_scale = 1.1
 
+        # Aumento da escala de pontos conforme a dificuldade aumenta
+        self.pontos_aumento = 1.5
+
+        # Inicializa as configurações do jogo
         self.initialize_dynamic_settings()
 
     def initialize_dynamic_settings(self):
@@ -51,3 +55,5 @@ class Configuracoes:
         self.nave_speed_factor *= self.speedup_scale
         self.municao_speed_factor *= self.speedup_scale
         self.alien_speed_factor *= self.speedup_scale
+
+        self.alien_pontos = int(self.alien_pontos * self.pontos_aumento)

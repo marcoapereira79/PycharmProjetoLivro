@@ -1,12 +1,13 @@
 import pygame
 
-class Nave:
+
+class Nave():
     def __init__(self, ai_configuracoes, tela):
         """Inicializa a espaçonave e define sua posição inicial."""
         self.ai_configuracoes = ai_configuracoes
         self.tela = tela
-        self.imge = pygame.image.load('/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/imagens/nave_nova1.bmp')
-        self.rect = self.imge.get_rect()
+        self.image = pygame.image.load('/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/imagens/nave_nova1.bmp')
+        self.rect = self.image.get_rect()
         self.tela_rect = tela.get_rect()
         self.rect.centerx = self.tela_rect.centerx  # Inicia cada nova espaçonave na parte inferior central da tela
         self.center = float(self.rect.centerx)   # Transforma self.rect.centerx em ponto flutuante
@@ -26,7 +27,7 @@ class Nave:
 
     def blitme(self):
         """Desenha a espaçonave em sua posição atual"""
-        self.tela.blit(self.imge, self.rect)
+        self.tela.blit(self.image, self.rect)
 
     def centralizar_nave(self):
         """Centraliza a espaçonave na tela"""

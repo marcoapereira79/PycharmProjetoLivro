@@ -17,7 +17,7 @@ def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
         sys.exit()
 
 
-def check_eventos(ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes):
+def check_eventos(ai_configuracoes, tela, estatistica, rp,play_button, nave, aliens, municoes):
     """Responde a eventos de pressionamento de teclas e do mouse"""
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -28,9 +28,9 @@ def check_eventos(ai_configuracoes, tela, estatistica, play_button, nave, aliens
             check_keyup_events(evento, nave)
         elif evento.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes, mouse_x, mouse_y)
+            check_play_button(ai_configuracoes, tela, estatistica, rp, play_button, nave, aliens, municoes, mouse_x, mouse_y)
 
-def check_play_button (ai_configuracoes, tela, estatistica, play_button, nave, aliens, municoes, mouse_x, mouse_y):
+def check_play_button (ai_configuracoes, tela, estatistica, rp, play_button, nave, aliens, municoes, mouse_x, mouse_y):
     """Inicia um novo jogo quando o jogador clicar em Play e se o jogo não estiver ativo"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not estatistica.game_active:
@@ -44,6 +44,12 @@ def check_play_button (ai_configuracoes, tela, estatistica, play_button, nave, a
 
         # Torna o jogo ativo se o botão Play for clicado
         estatistica.game_active = True
+
+        # Reinicia as imagens do painel de pontuação
+        rp.prep_pontos()
+        rp.prep_pontos_maxima()
+        rp.prep_nivel()
+        rp.prep_naves()
 
         # Esvazia a lista de aliens e de projéteis
         aliens.empty()
@@ -102,18 +108,27 @@ def update_municoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica,
 
 def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp):
     """Responde a colisões entre projéteis e alienígenas."""
-    # Remove qualquer projétil e alienígena que tenham colidido
+    # Remove qualquer projétil e alienígena que tenham colidido, colisões recebe uma lista
     colisoes = pygame.sprite.groupcollide(municoes, aliens, True, True)
     # No caso de colisões
     if colisoes:
-        estatistica.pontos += ai_configuracoes.alien_pontos
-        rp.prep_pontos()
+        # Para verificar na lista colisões , os aliens que colidiram com o tiro
+        for aliens in colisoes.values():
+            estatistica.pontos += ai_configuracoes.alien_pontos * len(aliens)
+            # mostra o painel de pontos com a atualização dos pontos
+            rp.prep_pontos()
+        checa_pontuacao_maxima(estatistica, rp)
 
     # Se todos os aliens forem abatidos
     if len(aliens) == 0:
         # Destrói os projéteis existentes , aumenta a velocidade do jogo
         municoes.empty()
         ai_configuracoes.increase_speed()
+
+        # Aumenta o nivel do jogador
+        estatistica.nivel += 1
+        rp.prep_nivel()
+
         # Cria uma nova frota
         cria_frota(ai_configuracoes, tela, nave, aliens)
 
@@ -145,7 +160,7 @@ def get_number_aliens_x(ai_configuracoes, alien_width):
 
 def get_number_rows(ai_configuracoes, nave_height, alien_height):
     """Determina o número de linhas com alinígenas que cabem na tela"""
-    espaco_livre_y = (ai_configuracoes.tela_height - (3 *  alien_height) - nave_height)
+    espaco_livre_y = ((ai_configuracoes.tela_height ) - (3 *  alien_height) - nave_height)
     number_rows = int(espaco_livre_y / (2 * alien_height))
     return number_rows
 
@@ -155,14 +170,14 @@ def cria_frota(ai_configuracoes, tela, nave, aliens):
     # Cria um alienígena e calcula o nº de alienígenas numa linha
     alien = Alien(ai_configuracoes, tela)
     numero_aliens_x = get_number_aliens_x(ai_configuracoes, alien.rect.width)
-    number_rows = get_number_rows(ai_configuracoes, nave.rect.height, alien.rect.height)
+    number_rows = int(get_number_rows(ai_configuracoes, nave.rect.height, alien.rect.height))
     # Cria a frota de alienígenas
     # laço para preencher as linhas da tela(eixo y) com aliens
-    for row_number in range(number_rows):
+    for row_number in range(number_rows ):
         # laço para preencher uma linha (eixo x) com aliens
         for alien_number in range(numero_aliens_x):
             create_alien(ai_configuracoes, tela, aliens, alien_number, row_number)
-        # Adiciona o alienígena criado ao Group()
+            # Adiciona o alienígena criado ao Group()
         aliens.add(alien)
 
 
@@ -183,7 +198,7 @@ def trocar_direcao_frota(ai_configuracoes, aliens):
     ai_configuracoes.frota_direcao *= -1
 
 
-def update_aliens( ai_configuracoes,estatistica, tela, nave, aliens, municoes  ):
+def update_aliens( ai_configuracoes,estatistica, tela, rp, nave, aliens, municoes  ):
     """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
     # Checa se a horda chegou nas bordas
     check_frota_bordas(ai_configuracoes, aliens)
@@ -191,15 +206,15 @@ def update_aliens( ai_configuracoes,estatistica, tela, nave, aliens, municoes  )
     # Atualiza o movimento do alien
     aliens.update()
 
-    # Verifica se há algum alienígena que atingiu o fundo da tela sem ser destruído
-    checa_aliens_fundo(ai_configuracoes,estatistica,tela,nave,aliens,municoes)
-
     # Verifica se houve colisões entre alienígenas e a espaçonave
     if pygame.sprite.spritecollideany(nave, aliens):
-        nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes)
+        nave_abatida(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes)
+
+     # Verifica se há algum alienígena que atingiu o fundo da tela sem ser destruído
+    checa_aliens_fundo(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes)
 
 
-def nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
+def nave_abatida(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes):
     """Responde ao fato de a espaçonave ter sido atingida por um alienigena"""
     # Se houverem naves (vida)
     if estatistica.naves_abatidas > 0:
@@ -207,6 +222,8 @@ def nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
         estatistica.naves_abatidas -= 1
         # Faz uma pausa
         sleep(0.5)
+        # Atualiza o painel de pontuações
+        rp.prep_naves()
     else:
         estatistica.game_active = False
         pygame.mouse.set_visible(True)
@@ -220,12 +237,19 @@ def nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
     nave.centralizar_nave()
 
 
-def checa_aliens_fundo(ai_configuracoes, estatistica, tela, nave, aliens, municoes):
+def checa_aliens_fundo(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes):
     """Verifica se algum alienigena alcançou a parte inferior da tela"""
     tela_rect = tela.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= tela_rect.bottom:
             # Trata esse caso do mesmo modo que é feito quando a espaçonave é atingida
-            nave_abatida(ai_configuracoes, estatistica, tela, nave, aliens, municoes)
+            nave_abatida(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes)
             break
+
+def checa_pontuacao_maxima(estatistica, rp):
+    """Verifica se há uma nova pontuação máxima"""
+    if estatistica.pontos > estatistica.pontuacao_maxima:
+        estatistica.pontuacao_maxima = estatistica.pontos
+        rp.prep_pontos_maxima()
+
 
