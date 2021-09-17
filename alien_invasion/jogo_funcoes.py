@@ -47,10 +47,7 @@ def check_play_button (ai_configuracoes, tela, estatistica, rp, play_button, nav
         estatistica.game_active = True
 
         # Reinicia as imagens do painel de pontuação
-        rp.prep_pontos()
-        rp.prep_pontos_maxima()
-        rp.prep_nivel()
-        rp.prep_naves()
+        rp.prepara_imagens()
 
         # Esvazia a lista de aliens e de projéteis
         aliens.empty()
@@ -126,12 +123,17 @@ def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens,
         municoes.empty()
         ai_configuracoes.increase_speed()
 
-        # Aumenta o nivel do jogador
-        estatistica.nivel += 1
-        rp.prep_nivel()
+        #Altera o nível após toda frota ser destruída
+        start_novo_nivel(estatistica, rp)
 
         # Cria uma nova frota
         cria_frota(ai_configuracoes, tela, nave, aliens)
+
+def start_novo_nivel(estatistica , rp):
+    """Função que aumenta o nível do jogador e altera na tela"""
+    # Aumenta o nivel do jogador
+    estatistica.nivel += 1
+    rp.prep_nivel()
 
 
 def tiro_municao(ai_configuracoes, tela, nave, municoes):

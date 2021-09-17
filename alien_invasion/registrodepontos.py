@@ -17,6 +17,10 @@ class Registro_de_pontos():
         self.font = pygame.font.SysFont(None, 48)
         self.font_2 = pygame.font.SysFont(None, 32)
 
+        #Prepara as imagens de pontuação , recorde , level do jogo e naves restantes
+        self.prepara_imagens()
+
+    def prepara_imagens(self):
         # Prepara a imagem da pontuação inicial
         self.prep_pontos()
 
@@ -28,6 +32,7 @@ class Registro_de_pontos():
 
         # Prepara a imagem da quantidade de naves disponiveis para o jogador batalhar no jogo
         self.prep_naves()
+
 
     def prep_pontos(self):
         """Transforma a pontuação na parte superior direita da tela"""
