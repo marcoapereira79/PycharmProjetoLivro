@@ -8,6 +8,7 @@ import jogo_funcoes as jf
 from button import Button
 
 
+
 def run_game():
     pygame.init()
     # objeto das Configurações do jogo
@@ -18,8 +19,11 @@ def run_game():
     pygame.display.set_caption("Space War")
     # Cria o botão Play
     play_button = Button(ai_configuracoes, tela, "Play")
+
+    pontos = str(0)
+
     # Cria uma instância para armazenar dados estatíticos do jogo
-    estatistica = GameStats(ai_configuracoes)
+    estatistica = GameStats(ai_configuracoes, pontos)
     # Cria o regsirto de pontos
     rp = Registro_de_pontos(ai_configuracoes, tela, estatistica)
     # Cria uma espaçonave
@@ -30,6 +34,8 @@ def run_game():
     aliens = Group()
     # Cria a frota de alienígenas
     jf.cria_frota(ai_configuracoes, tela, nave, aliens)
+
+
 
     #Inicia o laço principal do jogo
     while True:

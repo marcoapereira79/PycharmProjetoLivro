@@ -2,6 +2,7 @@ import pygame.font
 from pygame.sprite import Group
 from nave2 import Nave
 
+
 class Registro_de_pontos():
     """Uma classe para mostrar informações sobre pontuação"""
     def __init__(self, ai_configuracoes, tela, estatistica):
@@ -43,7 +44,7 @@ class Registro_de_pontos():
 
     def prep_pontos_maxima(self):
         """Transforma a pontuação máxima em uma imagem renderizada"""
-        pontos_maxima = round(self.estatistica.pontuacao_maxima, -1)
+        pontos_maxima = round(self.estatistica.ler_pontuacao_maxima())
         pontos_maxima_str = "{:,}".format(pontos_maxima)
         self.pontos_maxima_imagem = self.font_2.render("recorde - " + pontos_maxima_str, True, self.text_color2, self.ai_configuracoes.bg_color)
 

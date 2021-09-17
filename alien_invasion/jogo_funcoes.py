@@ -4,6 +4,7 @@ from municao import Municao
 from alien import Alien
 from time import sleep
 
+
 def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
     """Responde a pressionamento de teclas"""
     if evento.key == pygame.K_RIGHT:
@@ -248,8 +249,10 @@ def checa_aliens_fundo(ai_configuracoes, estatistica, tela, rp, nave, aliens, mu
 
 def checa_pontuacao_maxima(estatistica, rp):
     """Verifica se há uma nova pontuação máxima"""
-    if estatistica.pontos > estatistica.pontuacao_maxima:
-        estatistica.pontuacao_maxima = estatistica.pontos
+    x = estatistica.ler_pontuacao_maxima()
+    if estatistica.pontos > x:
+        estatistica.pontuacao_maxima ()
+        p = estatistica.ler_pontuacao_maxima()
         rp.prep_pontos_maxima()
 
 
