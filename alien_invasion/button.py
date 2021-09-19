@@ -1,9 +1,9 @@
 import pygame.font
 
 
-class Button():
+class Button:
 
-    def __init__(self, ai_configuracoes, tela, msg):
+    def __init__(self, tela, msg ):
         """Inicializa os atributos do botão"""
         self.tela = tela
         self.tela_rect = tela.get_rect()
@@ -21,6 +21,8 @@ class Button():
         # A mensagem do botão deve ser preparada apenas uma vez
         self.prep_msg(msg)
 
+        self.som = pygame.mixer.Sound("/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/audio/inicio.ogg")
+
     def prep_msg(self, msg):
         """Transforma msg em imagem renderizada e centraliza o texto no botão."""
         self.msg_image = self.font.render(msg, True, self.text_color, self.button_color)
@@ -32,3 +34,6 @@ class Button():
         self.tela.fill(self.button_color, self.rect)
         # Desenha o texto sobre a tela
         self.tela.blit(self.msg_image, self.msg_image_rect)
+
+    def play(self):
+        self.som.play()

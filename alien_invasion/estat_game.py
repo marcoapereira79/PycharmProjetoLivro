@@ -1,3 +1,5 @@
+import pygame.mixer
+
 
 class GameStats():
     """Armazena dados estatísticos da Invasão Alienígena"""
@@ -8,6 +10,7 @@ class GameStats():
         self.reset_stats()
         self.game_active = False
         self.pontuacao_maxima()
+        self.som_nivel = pygame.mixer.Sound("/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/audio/nivel.ogg")
 
     def reset_stats(self):
         """Inicializa os dados estatísticos que podem mudar durante o jogo"""
@@ -53,3 +56,6 @@ class GameStats():
             return True
 
         recorde.close()
+
+    def tocar_premio(self):
+        self.som_nivel.play()

@@ -20,6 +20,8 @@ class Alien(Sprite):
         # Armazena a posição exata do alienígena
         self.x = float(self.rect.x)
 
+        self.som_tela_fundo = pygame.mixer.Sound("/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/audio/alien_fundo.ogg")
+
     def check_bordas(self):
         """Verifica se o alienígena chegou na borda da tela e devolve True"""
         tela_rect = self.tela.get_rect()
@@ -32,3 +34,6 @@ class Alien(Sprite):
         """Move o alienígena para a direita ou para a esquerda"""
         self.x += (self.ai_configuracoes.alien_speed_factor * self.ai_configuracoes.frota_direcao)
         self.rect.x = self.x
+
+    def som_fundo(self):
+        self.som_tela_fundo.play()

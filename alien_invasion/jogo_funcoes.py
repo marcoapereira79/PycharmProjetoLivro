@@ -5,7 +5,7 @@ from alien import Alien
 from time import sleep
 
 
-def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
+def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes, som_tiro):
     """Responde a pressionamento de teclas"""
     if evento.key == pygame.K_RIGHT:
         nave.move_direita = True
@@ -13,18 +13,18 @@ def check_keydown_events(evento, ai_configuracoes, tela, nave, municoes):
         nave.move_esquerda = True
     elif evento.key == pygame.K_SPACE:
         # Cria um novo projétil e o adiciona ao grupo de projéteis
-        tiro_municao(ai_configuracoes, tela, nave, municoes)
+        tiro_municao(ai_configuracoes, tela, nave, municoes, som_tiro)
     elif evento.key == pygame.K_q:
         sys.exit()
 
 
-def check_eventos(ai_configuracoes, tela, estatistica, rp,play_button, nave, aliens, municoes):
+def check_eventos(ai_configuracoes, tela, estatistica, rp,play_button, nave, aliens, municoes, som_tiro):
     """Responde a eventos de pressionamento de teclas e do mouse"""
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             sys.exit()
         elif evento.type == pygame.KEYDOWN:
-            check_keydown_events(evento, ai_configuracoes, tela, nave, municoes)
+            check_keydown_events(evento, ai_configuracoes, tela, nave, municoes, som_tiro)
         elif evento.type == pygame.KEYUP:
             check_keyup_events(evento, nave)
         elif evento.type == pygame.MOUSEBUTTONDOWN:
@@ -35,6 +35,7 @@ def check_play_button (ai_configuracoes, tela, estatistica, rp, play_button, nav
     """Inicia um novo jogo quando o jogador clicar em Play e se o jogo não estiver ativo"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not estatistica.game_active:
+        play_button.play()
         # Reinicia as configurações do jogo
         ai_configuracoes.initialize_dynamic_settings()
         # Oculta o cursor do mouse
@@ -92,7 +93,7 @@ def update_tela(ai_configuracoes, estatistica,rp ,tela, nave, aliens, municoes, 
     pygame.display.flip()
 
 
-def update_municoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp):
+def update_municoes(ai_configuracoes, tela, nave, municoes, aliens, estatistica, rp, som_tiro):
     """Atualiza as posicoes dos projéteis antigos, se o projétil chega ao fim da tela é removido"""
     # Atualiza a posição dos projéteis
     municoes.update()
@@ -131,16 +132,17 @@ def check_municao_alien_colisoes(ai_configuracoes, tela, nave, municoes, aliens,
 
 def start_novo_nivel(estatistica , rp):
     """Função que aumenta o nível do jogador e altera na tela"""
+    estatistica.tocar_premio()
     # Aumenta o nivel do jogador
     estatistica.nivel += 1
     rp.prep_nivel()
 
 
-def tiro_municao(ai_configuracoes, tela, nave, municoes):
+def tiro_municao(ai_configuracoes, tela, nave, municoes, som_tiro):
     """Dispara um projétil se o limite ainda não foi lançado"""
     # Cria um novo projétil e o adiciona ao grupo de projéteis
     if len(municoes) < ai_configuracoes.municoes_permitida:
-        nova_municao = Municao(ai_configuracoes, tela, nave)
+        nova_municao = Municao(ai_configuracoes, tela, nave, som_tiro)
         municoes.add(nova_municao)
 
 
@@ -201,7 +203,7 @@ def trocar_direcao_frota(ai_configuracoes, aliens):
     ai_configuracoes.frota_direcao *= -1
 
 
-def update_aliens( ai_configuracoes,estatistica, tela, rp, nave, aliens, municoes  ):
+def update_aliens( ai_configuracoes,estatistica, tela, rp, nave, aliens, municoes):
     """Verifica se a frota está numa das bordas e então atualiza as posições dos aliens"""
     # Checa se a horda chegou nas bordas
     check_frota_bordas(ai_configuracoes, aliens)
@@ -211,6 +213,7 @@ def update_aliens( ai_configuracoes,estatistica, tela, rp, nave, aliens, municoe
 
     # Verifica se houve colisões entre alienígenas e a espaçonave
     if pygame.sprite.spritecollideany(nave, aliens):
+        nave.som_explosao()
         nave_abatida(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes)
 
      # Verifica se há algum alienígena que atingiu o fundo da tela sem ser destruído
@@ -245,6 +248,8 @@ def checa_aliens_fundo(ai_configuracoes, estatistica, tela, rp, nave, aliens, mu
     tela_rect = tela.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= tela_rect.bottom:
+            # Som do alien ao chegar ao fundo da tela
+            alien.som_fundo()
             # Trata esse caso do mesmo modo que é feito quando a espaçonave é atingida
             nave_abatida(ai_configuracoes, estatistica, tela, rp, nave, aliens, municoes)
             break

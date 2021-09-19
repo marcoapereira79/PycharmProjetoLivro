@@ -14,6 +14,7 @@ class Nave():
         self.rect.bottom = self.tela_rect.bottom  # Inicia cada nova espaçonave na parte inferior
         self.move_direita = False                 # Flag de movimento da nave para a direita
         self.move_esquerda = False                # Flag de movimento da nave para a esquerda
+        self.som_nave_explosao = pygame.mixer.Sound("/home/marco_user/Documentos/Projetos/Python_ProjetoLivro/audio/explosao_nave.ogg")
 
     def update_nave(self):
         """Atualiza a posição da espaçonave de acordo com a flag de movimento"""
@@ -32,3 +33,6 @@ class Nave():
     def centralizar_nave(self):
         """Centraliza a espaçonave na tela"""
         self.center = self.tela_rect.centerx
+
+    def som_explosao(self):
+        self.som_nave_explosao.play()
